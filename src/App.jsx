@@ -50,11 +50,28 @@ const BADGES = [
 ];
 
 const POINTS = { workout: 10, weight: 5, photo: 15, badge: 20 };
-const EMPTY  = { workouts: [], weights: [], photos: [], badges: [] };
+// 👉 NEW: dynamic workout points
+const getWorkoutPoints = (minutes) => {
+  if (!minutes) return 0;
+  return Math.round(minutes * 0.5);
+};
+const EMPTY = {
+  workouts: [],
+  weights: [],
+  photos: [],
+  badges: [],
+  avatar: "",
+  name: "",
+  rival: ""
+};
 
 const today   = () => new Date().toISOString().split("T")[0];
 const fmtDate = (d) => new Date(d + "T00:00:00").toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
-const calcPoints = (u) => u.workouts.length * POINTS.workout + u.weights.length * POINTS.weight + u.photos.length * POINTS.photo + u.badges.length * POINTS.badge;
+const calcPoints = (u = {}) =>
+  (u.workouts || []).reduce((sum, w) => sum + (w?.points || 0), 0) +
+  (u.weights || []).length * POINTS.weight +
+  (u.photos || []).length * POINTS.photo +
+  (u.badges || []).length * POINTS.badge;
 
 function checkBadges(user) {
   const e = new Set(user.badges);
@@ -84,7 +101,10 @@ export default function FitDuelia() {
   const loadData = React.useCallback(async () => {
     try {
       const [sofiaData, friendData] = await Promise.all([dbLoad("sofia"), dbLoad("friend")]);
-      setData({ sofia: sofiaData || EMPTY, friend: friendData || EMPTY });
+      setData({
+  sofia: { ...EMPTY, ...(sofiaData || {}) },
+  friend: { ...EMPTY, ...(friendData || {}) }
+});
       setDbError(false);
     } catch (e) {
       setDbError(true);
@@ -104,16 +124,21 @@ export default function FitDuelia() {
     return ok;
   };
 
-  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3500); };
-
   const addWorkout = async () => {
     if (!form.type || !form.minutes) return;
     const cur = { ...data[whoAmI] };
-    cur.workouts = [{ id: Date.now(), type: form.type, minutes: parseInt(form.minutes), date: today(), note: form.note || "" }, ...cur.workouts];
+    cur.workouts = [{
+  id: Date.now(),
+  type: form.type,
+  minutes: parseInt(form.minutes),
+  date: form.date || today(), // 👈 allows past date
+  note: form.note || "",
+  points: getWorkoutPoints(parseInt(form.minutes)) // 👈 NEW
+}, ...cur.workouts];
     cur.badges = checkBadges(cur);
     setData(p => ({ ...p, [whoAmI]: cur }));
     await saveUser(whoAmI, cur);
-    showToast(`+${POINTS.workout} очков! ${form.type} записана ✨`);
+    showToast(`+${getWorkoutPoints(form.minutes)} очков! ${form.type} записана ✨`);
     setModal(null); setForm({});
   };
 

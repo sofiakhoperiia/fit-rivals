@@ -1,6 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
-// ─── Supabase config ──────────────────────────────────────────────────────────
 const SUPABASE_URL = "https://bcsgrgxxkrmeewoedqne.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjc2dyZ3h4a3JtZWV3b2VkcW5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NTAwMjcsImV4cCI6MjA5MTIyNjAyN30.oHQQTmRkee4jgB4_BccrbExlvRsfLg15QILZzwKBX3I";
 
@@ -24,7 +23,6 @@ async function dbLoad(uid) {
 }
 
 async function dbSave(uid, userData) {
-  // upsert — insert or update
   const res = await sbFetch(`fitrival_users`, {
     method: "POST",
     headers: { "Prefer": "resolution=merge-duplicates,return=representation" },
@@ -33,39 +31,29 @@ async function dbSave(uid, userData) {
   return res.ok;
 }
 
-// ─── Константы ────────────────────────────────────────────────────────────────
 const USERS = {
   sofia:  { name: "София",    emoji: "🔥", color: "#FF6B35" },
   friend: { name: "Стефания", emoji: "⚡", color: "#7C3AED" },
 };
 
-const EXERCISES = [
-  "Бег","Велосипед","Тренажёрный зал","Плавание",
-  "Йога","HIIT","Ходьба","Танцы","Другое",
-];
+const EXERCISES = ["Бег","Велосипед","Тренажёрный зал","Плавание","Йога","HIIT","Ходьба","Танцы","Другое"];
 
 const BADGES = [
-  { id: "first_workout",  icon: "👟", label: "Первый шаг",      desc: "Записать первую тренировку" },
-  { id: "five_workouts",  icon: "🏅", label: "Всерьёз взялась", desc: "Записать 5 тренировок" },
-  { id: "first_weight",   icon: "⚖️", label: "Взвесилась!",     desc: "Записать первый вес" },
-  { id: "weight_loss",    icon: "📉", label: "Легче!",           desc: "Похудеть на 0,5 кг" },
-  { id: "first_photo",    icon: "📸", label: "Хвастушка",        desc: "Поделиться фото прогресса" },
-  { id: "three_photos",   icon: "🖼️", label: "Фотограф",         desc: "Поделиться 3 фото" },
-  { id: "beat_friend",    icon: "🏆", label: "Лидер",            desc: "Занять первое место" },
+  { id: "first_workout", icon: "👟", label: "Первый шаг",      desc: "Записать первую тренировку" },
+  { id: "five_workouts", icon: "🏅", label: "Всерьёз взялась", desc: "Записать 5 тренировок" },
+  { id: "first_weight",  icon: "⚖️", label: "Взвесилась!",     desc: "Записать первый вес" },
+  { id: "weight_loss",   icon: "📉", label: "Легче!",           desc: "Похудеть на 0,5 кг" },
+  { id: "first_photo",   icon: "📸", label: "Хвастушка",        desc: "Поделиться фото прогресса" },
+  { id: "three_photos",  icon: "🖼️", label: "Фотограф",         desc: "Поделиться 3 фото" },
+  { id: "beat_friend",   icon: "🏆", label: "Лидер",            desc: "Занять первое место" },
 ];
 
 const POINTS = { workout: 10, weight: 5, photo: 15, badge: 20 };
 const EMPTY  = { workouts: [], weights: [], photos: [], badges: [] };
 
-// ─── Утилиты ─────────────────────────────────────────────────────────────────
 const today   = () => new Date().toISOString().split("T")[0];
 const fmtDate = (d) => new Date(d + "T00:00:00").toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
-
-const calcPoints = (u) =>
-  u.workouts.length * POINTS.workout +
-  u.weights.length  * POINTS.weight  +
-  u.photos.length   * POINTS.photo   +
-  u.badges.length   * POINTS.badge;
+const calcPoints = (u) => u.workouts.length * POINTS.workout + u.weights.length * POINTS.weight + u.photos.length * POINTS.photo + u.badges.length * POINTS.badge;
 
 function checkBadges(user) {
   const e = new Set(user.badges);
@@ -81,62 +69,42 @@ function checkBadges(user) {
   return [...e];
 }
 
-// ─── Компонент ────────────────────────────────────────────────────────────────
 export default function FitRivals() {
-  const [whoAmI,    setWhoAmI]    = useState(null);
-  const [data,      setData]      = useState({ sofia: EMPTY, friend: EMPTY });
-  const [loading,   setLoading]   = useState(true);
-  const [dbError,   setDbError]   = useState(false);
-  const [activeTab, setActiveTab] = useState("dashboard");
-  const [modal,     setModal]     = useState(null);
-  const [form,      setForm]      = useState({});
-  const [toast,     setToast]     = useState(null);
-  const [saving,    setSaving]    = useState(false);
+  const [whoAmI,    setWhoAmI]    = React.useState(null);
+  const [data,      setData]      = React.useState({ sofia: EMPTY, friend: EMPTY });
+  const [loading,   setLoading]   = React.useState(true);
+  const [dbError,   setDbError]   = React.useState(false);
+  const [activeTab, setActiveTab] = React.useState("dashboard");
+  const [modal,     setModal]     = React.useState(null);
+  const [form,      setForm]      = React.useState({});
+  const [toast,     setToast]     = React.useState(null);
+  const [saving,    setSaving]    = React.useState(false);
 
-  // ── Загрузка данных ────────────────────────────────────────────────────────
-  const loadData = useCallback(async () => {
+  const loadData = React.useCallback(async () => {
     try {
-      const [sofiaData, friendData] = await Promise.all([
-        dbLoad("sofia"),
-        dbLoad("friend"),
-      ]);
-      setData({
-        sofia:  sofiaData  || EMPTY,
-        friend: friendData || EMPTY,
-      });
+      const [sofiaData, friendData] = await Promise.all([dbLoad("sofia"), dbLoad("friend")]);
+      setData({ sofia: sofiaData || EMPTY, friend: friendData || EMPTY });
       setDbError(false);
     } catch (e) {
-      console.error("Ошибка загрузки:", e);
       setDbError(true);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => { loadData(); }, [loadData]);
+  React.useEffect(() => { loadData(); }, [loadData]);
+  React.useEffect(() => { const t = setInterval(loadData, 20000); return () => clearInterval(t); }, [loadData]);
 
-  // Авто-обновление каждые 20 сек
-  useEffect(() => {
-    const t = setInterval(loadData, 20000);
-    return () => clearInterval(t);
-  }, [loadData]);
-
-  // ── Сохранение ────────────────────────────────────────────────────────────
   const saveUser = async (uid, userData) => {
     setSaving(true);
     const ok = await dbSave(uid, userData);
     setSaving(false);
-    if (!ok) showToast("⚠️ Ошибка сохранения — проверь таблицу в Supabase");
+    if (!ok) showToast("⚠️ Ошибка сохранения");
     return ok;
   };
 
-  // ── Тост ──────────────────────────────────────────────────────────────────
-  const showToast = (msg) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 3500);
-  };
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3500); };
 
-  // ── Мутации ───────────────────────────────────────────────────────────────
   const addWorkout = async () => {
     if (!form.type || !form.minutes) return;
     const cur = { ...data[whoAmI] };
@@ -177,7 +145,6 @@ export default function FitRivals() {
     showToast("Данные сброшены.");
   };
 
-  // ── Вычисляемые ───────────────────────────────────────────────────────────
   const friendId   = whoAmI === "sofia" ? "friend" : "sofia";
   const myData     = whoAmI ? data[whoAmI]   : EMPTY;
   const friendData = whoAmI ? data[friendId] : EMPTY;
@@ -185,7 +152,6 @@ export default function FitRivals() {
   const friendPts  = calcPoints(friendData);
   const iWin       = myPts >= friendPts;
   const diff       = Math.abs(myPts - friendPts);
-
   const latestWeight = (uid) => { const w = data[uid].weights; return w.length ? w[0].value : null; };
   const weightChange = (uid) => {
     const w = data[uid].weights;
@@ -194,7 +160,6 @@ export default function FitRivals() {
     return (s[s.length - 1].value - s[0].value).toFixed(1);
   };
 
-  // ── Экран выбора ──────────────────────────────────────────────────────────
   if (!whoAmI) {
     return (
       <div style={S.root}>
@@ -202,17 +167,15 @@ export default function FitRivals() {
         <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:32 }}>
           <div style={{ fontFamily:"'Space Mono',monospace", color:"#FF6B35", fontSize:11, letterSpacing:4, marginBottom:12 }}>FIT RIVALS</div>
           <div style={{ fontSize:26, fontWeight:900, marginBottom:8, textAlign:"center" }}>Кто ты? 👀</div>
-          <div style={{ color:"#666", fontSize:14, marginBottom:40, textAlign:"center", lineHeight:1.6 }}>
-            Выбери свой профиль — данные сохраняются навсегда и синхронизируются автоматически.
-          </div>
+          <div style={{ color:"#666", fontSize:14, marginBottom:40, textAlign:"center", lineHeight:1.6 }}>Выбери свой профиль — данные сохраняются навсегда.</div>
           {dbError && (
             <div style={{ background:"#2a1515", border:"1px solid #f8717144", borderRadius:12, padding:"12px 16px", marginBottom:20, fontSize:12, color:"#f87171", maxWidth:320, lineHeight:1.6 }}>
-              ⚠️ Не удалось подключиться к базе данных. Убедись, что таблица <strong>fitrival_users</strong> создана в Supabase.
+              ⚠️ Не удалось подключиться к базе данных. Проверь таблицу <strong>fitrival_users</strong> в Supabase.
             </div>
           )}
           <div style={{ display:"flex", flexDirection:"column", gap:14, width:"100%", maxWidth:320 }}>
             {Object.entries(USERS).map(([key, u]) => (
-              <button key={key} onClick={() => { setWhoAmI(key); }} className="profile-btn"
+              <button key={key} onClick={() => setWhoAmI(key)} className="profile-btn"
                 style={{ background:"#18181D", border:`2px solid ${u.color}44`, borderRadius:16, padding:"20px 24px", cursor:"pointer", display:"flex", alignItems:"center", gap:16, fontFamily:"'Outfit',sans-serif" }}>
                 <div style={{ fontSize:40 }}>{u.emoji}</div>
                 <div style={{ textAlign:"left" }}>
@@ -222,9 +185,7 @@ export default function FitRivals() {
               </button>
             ))}
           </div>
-          <div style={{ marginTop:32, fontSize:11, color:"#444", textAlign:"center", maxWidth:280, lineHeight:1.6 }}>
-            🔒 Данные хранятся в базе данных и не исчезнут при обновлении страницы.
-          </div>
+          <div style={{ marginTop:32, fontSize:11, color:"#444", textAlign:"center", maxWidth:280, lineHeight:1.6 }}>🔒 Данные хранятся в базе данных и не исчезнут при обновлении.</div>
         </div>
       </div>
     );
@@ -244,7 +205,6 @@ export default function FitRivals() {
 
   const myUser    = USERS[whoAmI];
   const theirUser = USERS[friendId];
-
   const TABS = [
     { id:"dashboard", icon:"🏆", label:"Доска" },
     { id:"workouts",  icon:"💪", label:"Тренировки" },
@@ -257,8 +217,6 @@ export default function FitRivals() {
     <div style={S.root}>
       <style>{css}</style>
       <div style={{ maxWidth:500, margin:"0 auto", padding:"20px 16px 0" }}>
-
-        {/* Шапка */}
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
           <div>
             <div style={{ fontFamily:"'Space Mono',monospace", fontSize:10, color:"#FF6B35", letterSpacing:3, marginBottom:3 }}>FIT RIVALS</div>
@@ -271,7 +229,6 @@ export default function FitRivals() {
           </div>
         </div>
 
-        {/* Таблица очков */}
         <div className="card" style={{ padding:20, marginBottom:18, background: iWin ? "linear-gradient(135deg,#1e1208,#251808)" : "linear-gradient(135deg,#12101e,#1a1528)", border:`1px solid ${iWin ? "#FF6B3530" : "#7C3AED30"}` }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
             <div style={{ textAlign:"center" }}>
@@ -298,7 +255,6 @@ export default function FitRivals() {
           </div>
         </div>
 
-        {/* Вкладки */}
         <div style={{ display:"flex", gap:6, marginBottom:18, overflowX:"auto", paddingBottom:2 }}>
           {TABS.map(t => (
             <button key={t.id} onClick={() => setActiveTab(t.id)} className="tab-btn"
@@ -308,15 +264,14 @@ export default function FitRivals() {
           ))}
         </div>
 
-        {/* ── ДОСКА ── */}
         {activeTab === "dashboard" && (
           <div className="tab-content">
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:14 }}>
               {[
-                { label:"Тренировки",    my: myData.workouts.length,   their: friendData.workouts.length,   icon:"🏃" },
-                { label:"Текущий вес",   my: latestWeight(whoAmI)  ? latestWeight(whoAmI)  + " кг" : "—", their: latestWeight(friendId) ? latestWeight(friendId) + " кг" : "—", icon:"⚖️" },
-                { label:"Результат",     my: weightChange(whoAmI)  !== null ? Math.abs(weightChange(whoAmI))  + " кг" : "—", their: weightChange(friendId) !== null ? Math.abs(weightChange(friendId)) + " кг" : "—", icon:"📉" },
-                { label:"Значки",        my: myData.badges.length,     their: friendData.badges.length,     icon:"🎖️" },
+                { label:"Тренировки", my: myData.workouts.length, their: friendData.workouts.length, icon:"🏃" },
+                { label:"Текущий вес", my: latestWeight(whoAmI) ? latestWeight(whoAmI)+" кг" : "—", their: latestWeight(friendId) ? latestWeight(friendId)+" кг" : "—", icon:"⚖️" },
+                { label:"Результат", my: weightChange(whoAmI) !== null ? Math.abs(weightChange(whoAmI))+" кг" : "—", their: weightChange(friendId) !== null ? Math.abs(weightChange(friendId))+" кг" : "—", icon:"📉" },
+                { label:"Значки", my: myData.badges.length, their: friendData.badges.length, icon:"🎖️" },
               ].map(s => (
                 <div key={s.label} className="card" style={{ padding:"14px 12px" }}>
                   <div style={{ fontSize:18, marginBottom:8 }}>{s.icon}</div>
@@ -328,12 +283,11 @@ export default function FitRivals() {
                 </div>
               ))}
             </div>
-
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10, marginBottom:14 }}>
               {[
                 { icon:"💪", label:"Тренировка", pts:"+10", action:() => setModal("workout") },
-                { icon:"⚖️", label:"Вес",         pts:"+5",  action:() => setModal("weight")  },
-                { icon:"📸", label:"Фото",         pts:"+15", action:() => setModal("photo")   },
+                { icon:"⚖️", label:"Вес", pts:"+5", action:() => setModal("weight") },
+                { icon:"📸", label:"Фото", pts:"+15", action:() => setModal("photo") },
               ].map(a => (
                 <button key={a.label} onClick={a.action} className="action-btn"
                   style={{ background:"#18181D", border:"1px solid #2a2a32", borderRadius:14, padding:"16px 8px", cursor:"pointer", color:"white", fontFamily:"'Outfit',sans-serif", textAlign:"center", transition:"all 0.2s" }}>
@@ -343,7 +297,6 @@ export default function FitRivals() {
                 </button>
               ))}
             </div>
-
             <div style={{ fontSize:13, fontWeight:700, marginBottom:10, color:"#888" }}>Последняя активность</div>
             {[
               ...myData.workouts.slice(0,2).map(w => ({ ...w, kind:"workout", owner:whoAmI })),
@@ -376,40 +329,37 @@ export default function FitRivals() {
           </div>
         )}
 
-        {/* ── ТРЕНИРОВКИ ── */}
         {activeTab === "workouts" && (
           <div className="tab-content">
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
               <div style={{ fontSize:16, fontWeight:700 }}>Все тренировки</div>
               <button className="btn-primary" style={{ background:myUser.color }} onClick={() => setModal("workout")}>+ Добавить</button>
             </div>
-            {[...myData.workouts.map(w => ({ ...w, owner:whoAmI })), ...friendData.workouts.map(w => ({ ...w, owner:friendId }))]
-              .sort((a,b) => b.id-a.id).map((w,i) => {
-                const u = USERS[w.owner];
-                return (
-                  <div key={i} className="card" style={{ padding:"14px 16px", marginBottom:10, borderLeft:`3px solid ${u.color}` }}>
-                    <div style={{ display:"flex", justifyContent:"space-between" }}>
-                      <div>
-                        <div style={{ fontSize:13, fontWeight:700, marginBottom:4 }}>{w.type}
-                          <span style={{ fontSize:10, background:u.color+"22", color:u.color, padding:"2px 8px", borderRadius:99, marginLeft:8, fontWeight:600 }}>{u.emoji} {u.name}</span>
-                        </div>
-                        {w.note && <div style={{ fontSize:12, color:"#777" }}>{w.note}</div>}
+            {[...myData.workouts.map(w => ({ ...w, owner:whoAmI })), ...friendData.workouts.map(w => ({ ...w, owner:friendId }))].sort((a,b) => b.id-a.id).map((w,i) => {
+              const u = USERS[w.owner];
+              return (
+                <div key={i} className="card" style={{ padding:"14px 16px", marginBottom:10, borderLeft:`3px solid ${u.color}` }}>
+                  <div style={{ display:"flex", justifyContent:"space-between" }}>
+                    <div>
+                      <div style={{ fontSize:13, fontWeight:700, marginBottom:4 }}>{w.type}
+                        <span style={{ fontSize:10, background:u.color+"22", color:u.color, padding:"2px 8px", borderRadius:99, marginLeft:8, fontWeight:600 }}>{u.emoji} {u.name}</span>
                       </div>
-                      <div style={{ textAlign:"right" }}>
-                        <div style={{ fontSize:18, fontWeight:700, color:u.color }}>{w.minutes} мин</div>
-                        <div style={{ fontSize:10, color:"#555" }}>{fmtDate(w.date)}</div>
-                      </div>
+                      {w.note && <div style={{ fontSize:12, color:"#777" }}>{w.note}</div>}
+                    </div>
+                    <div style={{ textAlign:"right" }}>
+                      <div style={{ fontSize:18, fontWeight:700, color:u.color }}>{w.minutes} мин</div>
+                      <div style={{ fontSize:10, color:"#555" }}>{fmtDate(w.date)}</div>
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              );
+            })}
             {myData.workouts.length===0 && friendData.workouts.length===0 && (
               <div style={{ textAlign:"center", padding:40, color:"#555" }}>Тренировок пока нет. Вперёд! 💪</div>
             )}
           </div>
         )}
 
-        {/* ── ВЕС ── */}
         {activeTab === "weight" && (
           <div className="tab-content">
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
@@ -417,18 +367,12 @@ export default function FitRivals() {
               <button className="btn-primary" style={{ background:myUser.color }} onClick={() => setModal("weight")}>+ Записать</button>
             </div>
             {[whoAmI, friendId].map(uid => {
-              const u   = USERS[uid];
-              const wts = data[uid].weights;
-              const chg = weightChange(uid);
+              const u = USERS[uid]; const wts = data[uid].weights; const chg = weightChange(uid);
               return (
                 <div key={uid} className="card" style={{ padding:16, marginBottom:14 }}>
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
                     <div style={{ fontSize:14, fontWeight:700 }}>{u.emoji} {u.name}</div>
-                    {chg !== null && (
-                      <div style={{ fontSize:12, fontWeight:700, color: parseFloat(chg)<=0 ? "#4ade80" : "#f87171" }}>
-                        {parseFloat(chg)<=0 ? `↓ −${Math.abs(chg)} кг` : `↑ +${chg} кг`}
-                      </div>
-                    )}
+                    {chg !== null && <div style={{ fontSize:12, fontWeight:700, color: parseFloat(chg)<=0 ? "#4ade80" : "#f87171" }}>{parseFloat(chg)<=0 ? `↓ −${Math.abs(chg)} кг` : `↑ +${chg} кг`}</div>}
                   </div>
                   {wts.length > 0 ? (
                     <div style={{ display:"flex", gap:8, overflowX:"auto", paddingBottom:4 }}>
@@ -440,16 +384,13 @@ export default function FitRivals() {
                         </div>
                       ))}
                     </div>
-                  ) : (
-                    <div style={{ color:"#555", fontSize:12, textAlign:"center", padding:16 }}>Записей пока нет</div>
-                  )}
+                  ) : <div style={{ color:"#555", fontSize:12, textAlign:"center", padding:16 }}>Записей пока нет</div>}
                 </div>
               );
             })}
           </div>
         )}
 
-        {/* ── ФОТО ── */}
         {activeTab === "photos" && (
           <div className="tab-content">
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
@@ -463,28 +404,26 @@ export default function FitRivals() {
               </div>
             ) : (
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
-                {[...myData.photos.map(p => ({ ...p, owner:whoAmI })), ...friendData.photos.map(p => ({ ...p, owner:friendId }))]
-                  .sort((a,b) => b.id-a.id).map((p,i) => {
-                    const u = USERS[p.owner];
-                    return (
-                      <div key={i} className="card" style={{ overflow:"hidden" }}>
-                        <div style={{ height:130, background:`linear-gradient(135deg,${u.color}22,#25252D)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:52 }}>
-                          {p.url ? <img src={p.url} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }} onError={e => { e.target.style.display="none"; }} /> : "💪"}
-                        </div>
-                        <div style={{ padding:10 }}>
-                          <div style={{ fontSize:10, color:u.color, fontWeight:700, marginBottom:4 }}>{u.emoji} {u.name}</div>
-                          <div style={{ fontSize:11, color:"#ccc" }}>{p.caption}</div>
-                          <div style={{ fontSize:9, color:"#555", marginTop:4 }}>{fmtDate(p.date)}</div>
-                        </div>
+                {[...myData.photos.map(p => ({ ...p, owner:whoAmI })), ...friendData.photos.map(p => ({ ...p, owner:friendId }))].sort((a,b) => b.id-a.id).map((p,i) => {
+                  const u = USERS[p.owner];
+                  return (
+                    <div key={i} className="card" style={{ overflow:"hidden" }}>
+                      <div style={{ height:130, background:`linear-gradient(135deg,${u.color}22,#25252D)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:52 }}>
+                        {p.url ? <img src={p.url} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }} onError={e => { e.target.style.display="none"; }} /> : "💪"}
                       </div>
-                    );
-                  })}
+                      <div style={{ padding:10 }}>
+                        <div style={{ fontSize:10, color:u.color, fontWeight:700, marginBottom:4 }}>{u.emoji} {u.name}</div>
+                        <div style={{ fontSize:11, color:"#ccc" }}>{p.caption}</div>
+                        <div style={{ fontSize:9, color:"#555", marginTop:4 }}>{fmtDate(p.date)}</div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
         )}
 
-        {/* ── ЗНАЧКИ ── */}
         {activeTab === "badges" && (
           <div className="tab-content">
             <div style={{ fontSize:16, fontWeight:700, marginBottom:14 }}>Достижения</div>
@@ -492,9 +431,7 @@ export default function FitRivals() {
               const u = USERS[uid];
               return (
                 <div key={uid} style={{ marginBottom:20 }}>
-                  <div style={{ fontSize:12, color:"#777", fontWeight:600, marginBottom:10 }}>
-                    {u.emoji} {u.name} — {data[uid].badges.length} из {BADGES.length} получено
-                  </div>
+                  <div style={{ fontSize:12, color:"#777", fontWeight:600, marginBottom:10 }}>{u.emoji} {u.name} — {data[uid].badges.length} из {BADGES.length} получено</div>
                   <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
                     {BADGES.map(b => {
                       const unlocked = data[uid].badges.includes(b.id);
@@ -521,11 +458,9 @@ export default function FitRivals() {
         <div style={{ height:40 }} />
       </div>
 
-      {/* ── МОДАЛЬНЫЕ ОКНА ── */}
       {modal && (
         <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.75)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:100, backdropFilter:"blur(4px)" }} onClick={() => setModal(null)}>
           <div className="card animate-in" style={{ width:"90%", maxWidth:380, padding:24 }} onClick={e => e.stopPropagation()}>
-
             {modal === "workout" && <>
               <div style={{ fontSize:18, fontWeight:700, marginBottom:18 }}>💪 Записать тренировку</div>
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
@@ -541,7 +476,6 @@ export default function FitRivals() {
                 </div>
               </div>
             </>}
-
             {modal === "weight" && <>
               <div style={{ fontSize:18, fontWeight:700, marginBottom:18 }}>⚖️ Записать вес</div>
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
@@ -553,14 +487,13 @@ export default function FitRivals() {
                 </div>
               </div>
             </>}
-
             {modal === "photo" && <>
               <div style={{ fontSize:18, fontWeight:700, marginBottom:18 }}>📸 Поделиться фото</div>
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                 <input className="input" type="url" placeholder="Ссылка на фото (Imgur, Google Фото…)" value={form.photoUrl||""} onChange={e => setForm({...form, photoUrl:e.target.value})} />
                 <input className="input" type="text" placeholder="Подпись (напр. Неделя 3 💪)" value={form.caption||""} onChange={e => setForm({...form, caption:e.target.value})} />
                 <div style={{ background:"#25252D", borderRadius:10, padding:10, fontSize:11, color:"#777", lineHeight:1.6 }}>
-                  💡 Совет: загрузи фото на <strong style={{ color:"#aaa" }}>imgur.com</strong>, нажми правой кнопкой → «Копировать адрес изображения» и вставь сюда.
+                  💡 Загрузи фото на <strong style={{ color:"#aaa" }}>imgur.com</strong>, правая кнопка → «Копировать адрес изображения», вставь сюда.
                 </div>
                 <div style={{ display:"flex", gap:10, marginTop:6 }}>
                   <button className="btn-sec" style={{ flex:1 }} onClick={() => setModal(null)}>Отмена</button>
@@ -568,12 +501,10 @@ export default function FitRivals() {
                 </div>
               </div>
             </>}
-
           </div>
         </div>
       )}
 
-      {/* Тост */}
       {toast && (
         <div style={{ position:"fixed", bottom:28, left:"50%", transform:"translateX(-50%)", background:myUser?.color||"#FF6B35", color:"white", padding:"12px 24px", borderRadius:99, fontSize:13, fontWeight:700, zIndex:200, whiteSpace:"nowrap", boxShadow:"0 8px 30px rgba(0,0,0,0.4)", animation:"toastIn 0.3s ease" }}>
           {toast}
@@ -583,9 +514,7 @@ export default function FitRivals() {
   );
 }
 
-const S = {
-  root: { fontFamily:"'Outfit',sans-serif", background:"#0D0D0F", color:"#F0EDE8", minHeight:"100vh" },
-};
+const S = { root: { fontFamily:"'Outfit',sans-serif", background:"#0D0D0F", color:"#F0EDE8", minHeight:"100vh" } };
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&family=Space+Mono:wght@700&display=swap');

@@ -31,21 +31,22 @@ async function dbSave(uid, userData) {
   return res.ok;
 }
 
+// ─── Константы ────────────────────────────────────────────────────────────────
 const USERS = {
-  sofia:  { name: "София",    emoji: "🔥", color: "#FF6B35" },
-  friend: { name: "Стефания", emoji: "⚡", color: "#7C3AED" },
+  sofia:  { name: "София",    emoji: "🌸", color: "#E8628A", light: "#FDE8EF" },
+  friend: { name: "Стефания", emoji: "🌷", color: "#A96CC8", light: "#F3E8FF" },
 };
 
-const EXERCISES = ["Бег","Велосипед","Тренажёрный зал","Плавание","Йога","HIIT","Ходьба","Танцы","Другое"];
+const EXERCISES = ["Бег","Велосипед","Тренажёрный зал","Плавание","Йога","Пилатес","HIIT","Ходьба","Танцы","Растяжка","Другое"];
 
 const BADGES = [
-  { id: "first_workout", icon: "👟", label: "Первый шаг",      desc: "Записать первую тренировку" },
-  { id: "five_workouts", icon: "🏅", label: "Всерьёз взялась", desc: "Записать 5 тренировок" },
-  { id: "first_weight",  icon: "⚖️", label: "Взвесилась!",     desc: "Записать первый вес" },
-  { id: "weight_loss",   icon: "📉", label: "Легче!",           desc: "Похудеть на 0,5 кг" },
-  { id: "first_photo",   icon: "📸", label: "Хвастушка",        desc: "Поделиться фото прогресса" },
-  { id: "three_photos",  icon: "🖼️", label: "Фотограф",         desc: "Поделиться 3 фото" },
-  { id: "beat_friend",   icon: "🏆", label: "Лидер",            desc: "Занять первое место" },
+  { id: "first_workout", icon: "✨", label: "Первый шаг",      desc: "Записать первую тренировку" },
+  { id: "five_workouts", icon: "💫", label: "Всерьёз взялась", desc: "Записать 5 тренировок" },
+  { id: "first_weight",  icon: "🎀", label: "Взвесилась!",     desc: "Записать первый вес" },
+  { id: "weight_loss",   icon: "🌟", label: "Легче!",           desc: "Похудеть на 0,5 кг" },
+  { id: "first_photo",   icon: "📸", label: "Красотка",         desc: "Поделиться фото прогресса" },
+  { id: "three_photos",  icon: "🌺", label: "Фотограф",         desc: "Поделиться 3 фото" },
+  { id: "beat_friend",   icon: "👑", label: "Королева",         desc: "Занять первое место" },
 ];
 
 const POINTS = { workout: 10, weight: 5, photo: 15, badge: 20 };
@@ -69,7 +70,7 @@ function checkBadges(user) {
   return [...e];
 }
 
-export default function FitRivals() {
+export default function FitDuelia() {
   const [whoAmI,    setWhoAmI]    = React.useState(null);
   const [data,      setData]      = React.useState({ sofia: EMPTY, friend: EMPTY });
   const [loading,   setLoading]   = React.useState(true);
@@ -112,7 +113,7 @@ export default function FitRivals() {
     cur.badges = checkBadges(cur);
     setData(p => ({ ...p, [whoAmI]: cur }));
     await saveUser(whoAmI, cur);
-    showToast(`+${POINTS.workout} очков! ${form.type} записана 🎉`);
+    showToast(`+${POINTS.workout} очков! ${form.type} записана ✨`);
     setModal(null); setForm({});
   };
 
@@ -123,14 +124,14 @@ export default function FitRivals() {
     cur.badges = checkBadges(cur);
     setData(p => ({ ...p, [whoAmI]: cur }));
     await saveUser(whoAmI, cur);
-    showToast(`+${POINTS.weight} очков! Вес записан ⚖️`);
+    showToast(`+${POINTS.weight} очков! Вес записан 🎀`);
     setModal(null); setForm({});
   };
 
   const addPhoto = async () => {
     if (!form.photoUrl && !form.caption) return;
     const cur = { ...data[whoAmI] };
-    cur.photos = [{ id: Date.now(), url: form.photoUrl || "", caption: form.caption || "Мой прогресс 💪", date: today() }, ...cur.photos];
+    cur.photos = [{ id: Date.now(), url: form.photoUrl || "", caption: form.caption || "Мой прогресс 🌸", date: today() }, ...cur.photos];
     cur.badges = checkBadges(cur);
     setData(p => ({ ...p, [whoAmI]: cur }));
     await saveUser(whoAmI, cur);
@@ -160,32 +161,38 @@ export default function FitRivals() {
     return (s[s.length - 1].value - s[0].value).toFixed(1);
   };
 
+  // ── Экран выбора ──────────────────────────────────────────────────────────
   if (!whoAmI) {
     return (
       <div style={S.root}>
         <style>{css}</style>
-        <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:32 }}>
-          <div style={{ fontFamily:"'Space Mono',monospace", color:"#FF6B35", fontSize:11, letterSpacing:4, marginBottom:12 }}>FIT RIVALS</div>
-          <div style={{ fontSize:26, fontWeight:900, marginBottom:8, textAlign:"center" }}>Кто ты? 👀</div>
-          <div style={{ color:"#666", fontSize:14, marginBottom:40, textAlign:"center", lineHeight:1.6 }}>Выбери свой профиль — данные сохраняются навсегда.</div>
+        <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:32, background:"#FDF6F9" }}>
+          <div style={{ fontSize:13, letterSpacing:6, color:"#C4819B", fontWeight:500, marginBottom:10, textTransform:"uppercase" }}>fitduelia</div>
+          <div style={{ fontSize:30, fontWeight:700, color:"#2D1A24", marginBottom:6, textAlign:"center", fontFamily:"'Playfair Display', Georgia, serif" }}>Привет, красотка! 🌸</div>
+          <div style={{ color:"#A0748A", fontSize:14, marginBottom:44, textAlign:"center", lineHeight:1.7, maxWidth:280 }}>
+            Выбери свой профиль — ваш прогресс синхронизируется автоматически.
+          </div>
           {dbError && (
-            <div style={{ background:"#2a1515", border:"1px solid #f8717144", borderRadius:12, padding:"12px 16px", marginBottom:20, fontSize:12, color:"#f87171", maxWidth:320, lineHeight:1.6 }}>
-              ⚠️ Не удалось подключиться к базе данных. Проверь таблицу <strong>fitrival_users</strong> в Supabase.
+            <div style={{ background:"#FDE8EF", border:"1px solid #E8628A44", borderRadius:14, padding:"12px 16px", marginBottom:20, fontSize:12, color:"#C0446A", maxWidth:300, lineHeight:1.6, textAlign:"center" }}>
+              ⚠️ Не удалось подключиться к базе данных. Проверь таблицу fitrival_users в Supabase.
             </div>
           )}
-          <div style={{ display:"flex", flexDirection:"column", gap:14, width:"100%", maxWidth:320 }}>
+          <div style={{ display:"flex", flexDirection:"column", gap:14, width:"100%", maxWidth:300 }}>
             {Object.entries(USERS).map(([key, u]) => (
               <button key={key} onClick={() => setWhoAmI(key)} className="profile-btn"
-                style={{ background:"#18181D", border:`2px solid ${u.color}44`, borderRadius:16, padding:"20px 24px", cursor:"pointer", display:"flex", alignItems:"center", gap:16, fontFamily:"'Outfit',sans-serif" }}>
-                <div style={{ fontSize:40 }}>{u.emoji}</div>
+                style={{ background:"white", border:`1.5px solid ${u.color}33`, borderRadius:20, padding:"20px 24px", cursor:"pointer", display:"flex", alignItems:"center", gap:16, fontFamily:"inherit", boxShadow:`0 4px 20px ${u.color}15` }}>
+                <div style={{ width:52, height:52, borderRadius:"50%", background:u.light, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, flexShrink:0 }}>{u.emoji}</div>
                 <div style={{ textAlign:"left" }}>
-                  <div style={{ fontSize:18, fontWeight:700, color:u.color }}>{u.name}</div>
-                  <div style={{ fontSize:12, color:"#555", marginTop:2 }}>Нажми, чтобы войти</div>
+                  <div style={{ fontSize:17, fontWeight:700, color:"#2D1A24" }}>{u.name}</div>
+                  <div style={{ fontSize:12, color:"#A0748A", marginTop:2 }}>Нажми, чтобы войти</div>
                 </div>
+                <div style={{ marginLeft:"auto", color:u.color, fontSize:18 }}>›</div>
               </button>
             ))}
           </div>
-          <div style={{ marginTop:32, fontSize:11, color:"#444", textAlign:"center", maxWidth:280, lineHeight:1.6 }}>🔒 Данные хранятся в базе данных и не исчезнут при обновлении.</div>
+          <div style={{ marginTop:36, fontSize:11, color:"#C4A8B6", textAlign:"center", maxWidth:260, lineHeight:1.7 }}>
+            🔒 Данные сохраняются навсегда и не исчезают при обновлении
+          </div>
         </div>
       </div>
     );
@@ -193,11 +200,11 @@ export default function FitRivals() {
 
   if (loading) {
     return (
-      <div style={{ ...S.root, display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh" }}>
+      <div style={{ ...S.root, display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", background:"#FDF6F9" }}>
         <style>{css}</style>
         <div style={{ textAlign:"center" }}>
-          <div style={{ fontSize:40, marginBottom:12 }} className="spin">⚡</div>
-          <div style={{ color:"#666", fontSize:14 }}>Загружаем данные…</div>
+          <div style={{ fontSize:36, marginBottom:12 }} className="spin">🌸</div>
+          <div style={{ color:"#A0748A", fontSize:14 }}>Загружаем ваш прогресс…</div>
         </div>
       </div>
     );
@@ -205,299 +212,328 @@ export default function FitRivals() {
 
   const myUser    = USERS[whoAmI];
   const theirUser = USERS[friendId];
+
   const TABS = [
-    { id:"dashboard", icon:"🏆", label:"Доска" },
+    { id:"dashboard", icon:"✨", label:"Главная" },
     { id:"workouts",  icon:"💪", label:"Тренировки" },
-    { id:"weight",    icon:"⚖️", label:"Вес" },
+    { id:"weight",    icon:"🎀", label:"Вес" },
     { id:"photos",    icon:"📸", label:"Фото" },
-    { id:"badges",    icon:"🎖️", label:"Значки" },
+    { id:"badges",    icon:"👑", label:"Значки" },
   ];
 
   return (
-    <div style={S.root}>
+    <div style={{ ...S.root, background:"#FDF6F9" }}>
       <style>{css}</style>
-      <div style={{ maxWidth:500, margin:"0 auto", padding:"20px 16px 0" }}>
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
-          <div>
-            <div style={{ fontFamily:"'Space Mono',monospace", fontSize:10, color:"#FF6B35", letterSpacing:3, marginBottom:3 }}>FIT RIVALS</div>
-            <div style={{ fontSize:20, fontWeight:900 }}>Привет, {myUser.emoji} {myUser.name}!</div>
-          </div>
-          <div style={{ display:"flex", gap:8, alignItems:"center" }}>
-            {saving && <div style={{ fontSize:10, color:"#555" }}>сохраняем…</div>}
-            <button onClick={() => { loadData(); showToast("Обновлено! 🔄"); }} className="icon-btn">↻</button>
-            <button onClick={() => setWhoAmI(null)} className="icon-btn">Выйти</button>
+      <div style={{ maxWidth:500, margin:"0 auto", padding:"0 0 40px" }}>
+
+        {/* Шапка */}
+        <div style={{ background:"white", padding:"18px 20px 14px", borderBottom:"1px solid #F2E6ED", marginBottom:0 }}>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+            <div>
+              <div style={{ fontSize:11, letterSpacing:5, color:"#C4819B", fontWeight:500, textTransform:"uppercase", marginBottom:2 }}>fitduelia</div>
+              <div style={{ fontSize:17, fontWeight:700, color:"#2D1A24" }}>Привет, {myUser.emoji} {myUser.name}!</div>
+            </div>
+            <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+              {saving && <div style={{ fontSize:10, color:"#C4A8B6" }}>сохраняем…</div>}
+              <button onClick={() => { loadData(); showToast("Обновлено! 🌸"); }} className="soft-btn">↻</button>
+              <button onClick={() => setWhoAmI(null)} className="soft-btn">Выйти</button>
+            </div>
           </div>
         </div>
 
-        <div className="card" style={{ padding:20, marginBottom:18, background: iWin ? "linear-gradient(135deg,#1e1208,#251808)" : "linear-gradient(135deg,#12101e,#1a1528)", border:`1px solid ${iWin ? "#FF6B3530" : "#7C3AED30"}` }}>
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
-            <div style={{ textAlign:"center" }}>
-              <div style={{ fontSize:36, fontFamily:"'Space Mono',monospace", color:myUser.color, fontWeight:700 }}>{myPts}</div>
-              <div style={{ fontSize:10, color:"#666", marginTop:2 }}>{myUser.emoji} Я</div>
-            </div>
-            <div style={{ textAlign:"center" }}>
-              <div style={{ fontSize:20, marginBottom:4 }}>{iWin ? "🏆" : "😤"}</div>
-              <div style={{ fontSize:9, fontWeight:800, letterSpacing:1, color: iWin ? myUser.color : theirUser.color }}>
-                {iWin ? (diff === 0 ? "НИЧЬЯ" : `+${diff} ВПЕРЕДИ`) : `${diff} ПОЗАДИ`}
+        <div style={{ padding:"16px 16px 0" }}>
+
+          {/* Карточка очков */}
+          <div style={{ background:"white", borderRadius:24, padding:20, marginBottom:16, border:"1px solid #F2E6ED", boxShadow:"0 4px 24px #E8628A0D" }}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
+              <div style={{ textAlign:"center", flex:1 }}>
+                <div style={{ fontSize:38, fontWeight:800, color:myUser.color, lineHeight:1 }}>{myPts}</div>
+                <div style={{ fontSize:11, color:"#C4A8B6", marginTop:4 }}>{myUser.emoji} {myUser.name}</div>
+              </div>
+              <div style={{ textAlign:"center", padding:"0 16px" }}>
+                <div style={{ fontSize:22, marginBottom:4 }}>{iWin ? "👑" : "🌷"}</div>
+                <div style={{ fontSize:9, fontWeight:700, letterSpacing:1, color: iWin ? myUser.color : theirUser.color, textTransform:"uppercase" }}>
+                  {iWin ? (diff === 0 ? "Ничья" : `+${diff} впереди`) : `${diff} позади`}
+                </div>
+              </div>
+              <div style={{ textAlign:"center", flex:1 }}>
+                <div style={{ fontSize:38, fontWeight:800, color:theirUser.color, lineHeight:1 }}>{friendPts}</div>
+                <div style={{ fontSize:11, color:"#C4A8B6", marginTop:4 }}>{theirUser.emoji} {theirUser.name}</div>
               </div>
             </div>
-            <div style={{ textAlign:"center" }}>
-              <div style={{ fontSize:36, fontFamily:"'Space Mono',monospace", color:theirUser.color, fontWeight:700 }}>{friendPts}</div>
-              <div style={{ fontSize:10, color:"#666", marginTop:2 }}>{theirUser.emoji} {theirUser.name}</div>
+            <div style={{ height:6, background:"#FAF0F4", borderRadius:99, overflow:"hidden" }}>
+              <div style={{ height:"100%", width:`${(myPts/(myPts+friendPts||1))*100}%`, background:`linear-gradient(90deg, ${myUser.color}, ${myUser.color}bb)`, borderRadius:99, transition:"width 0.6s ease" }} />
+            </div>
+            <div style={{ display:"flex", justifyContent:"space-between", marginTop:6, fontSize:10, color:"#D4AABB" }}>
+              <span>{myUser.name}: {Math.round((myPts/(myPts+friendPts||1))*100)}%</span>
+              <span>{theirUser.name}: {Math.round((friendPts/(myPts+friendPts||1))*100)}%</span>
             </div>
           </div>
-          <div style={{ height:8, background:"#2a2a32", borderRadius:99, overflow:"hidden" }}>
-            <div style={{ height:"100%", width:`${(myPts/(myPts+friendPts||1))*100}%`, background:`linear-gradient(90deg,${myUser.color},${myUser.color}cc)`, borderRadius:99, transition:"width 0.6s ease" }} />
-          </div>
-          <div style={{ display:"flex", justifyContent:"space-between", marginTop:6, fontSize:10, color:"#444" }}>
-            <span>Моя доля: {Math.round((myPts/(myPts+friendPts||1))*100)}%</span>
-            <span>{Math.round((friendPts/(myPts+friendPts||1))*100)}%: {theirUser.name}</span>
-          </div>
-        </div>
 
-        <div style={{ display:"flex", gap:6, marginBottom:18, overflowX:"auto", paddingBottom:2 }}>
-          {TABS.map(t => (
-            <button key={t.id} onClick={() => setActiveTab(t.id)} className="tab-btn"
-              style={{ flexShrink:0, background: activeTab===t.id ? myUser.color : "#18181D", border: activeTab===t.id ? "none" : "1px solid #2a2a32", borderRadius:10, padding:"9px 14px", cursor:"pointer", color:"white", fontSize:12, fontWeight:600, fontFamily:"'Outfit',sans-serif" }}>
-              {t.icon} {t.label}
-            </button>
-          ))}
-        </div>
+          {/* Вкладки */}
+          <div style={{ display:"flex", gap:6, marginBottom:16, overflowX:"auto", paddingBottom:2 }}>
+            {TABS.map(t => (
+              <button key={t.id} onClick={() => setActiveTab(t.id)} className="tab-btn"
+                style={{ flexShrink:0, background: activeTab===t.id ? myUser.color : "white", border: activeTab===t.id ? "none" : "1px solid #F0E0E8", borderRadius:99, padding:"8px 16px", cursor:"pointer", color: activeTab===t.id ? "white" : "#A0748A", fontSize:12, fontWeight:600, fontFamily:"inherit", transition:"all 0.2s", boxShadow: activeTab===t.id ? `0 4px 14px ${myUser.color}40` : "none" }}>
+                {t.icon} {t.label}
+              </button>
+            ))}
+          </div>
 
-        {activeTab === "dashboard" && (
-          <div className="tab-content">
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:14 }}>
-              {[
-                { label:"Тренировки", my: myData.workouts.length, their: friendData.workouts.length, icon:"🏃" },
-                { label:"Текущий вес", my: latestWeight(whoAmI) ? latestWeight(whoAmI)+" кг" : "—", their: latestWeight(friendId) ? latestWeight(friendId)+" кг" : "—", icon:"⚖️" },
-                { label:"Результат", my: weightChange(whoAmI) !== null ? Math.abs(weightChange(whoAmI))+" кг" : "—", their: weightChange(friendId) !== null ? Math.abs(weightChange(friendId))+" кг" : "—", icon:"📉" },
-                { label:"Значки", my: myData.badges.length, their: friendData.badges.length, icon:"🎖️" },
-              ].map(s => (
-                <div key={s.label} className="card" style={{ padding:"14px 12px" }}>
-                  <div style={{ fontSize:18, marginBottom:8 }}>{s.icon}</div>
-                  <div style={{ fontSize:10, color:"#666", marginBottom:8 }}>{s.label}</div>
-                  <div style={{ display:"flex", justifyContent:"space-between" }}>
-                    <div><div style={{ fontSize:16, fontWeight:700, color:myUser.color }}>{s.my}</div><div style={{ fontSize:9, color:"#555" }}>Я</div></div>
-                    <div style={{ textAlign:"right" }}><div style={{ fontSize:16, fontWeight:700, color:theirUser.color }}>{s.their}</div><div style={{ fontSize:9, color:"#555" }}>Она</div></div>
+          {/* ── ГЛАВНАЯ ── */}
+          {activeTab === "dashboard" && (
+            <div className="tab-content">
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:14 }}>
+                {[
+                  { label:"Тренировки",  my: myData.workouts.length,   their: friendData.workouts.length,   icon:"💪" },
+                  { label:"Текущий вес", my: latestWeight(whoAmI) ? latestWeight(whoAmI)+" кг" : "—", their: latestWeight(friendId) ? latestWeight(friendId)+" кг" : "—", icon:"⚖️" },
+                  { label:"Результат",   my: weightChange(whoAmI)  !== null ? Math.abs(weightChange(whoAmI))+" кг"  : "—", their: weightChange(friendId) !== null ? Math.abs(weightChange(friendId))+" кг" : "—", icon:"🌟" },
+                  { label:"Значки",      my: myData.badges.length,     their: friendData.badges.length,     icon:"👑" },
+                ].map(s => (
+                  <div key={s.label} style={{ background:"white", borderRadius:18, padding:"14px 14px 12px", border:"1px solid #F0E0E8" }}>
+                    <div style={{ fontSize:20, marginBottom:8 }}>{s.icon}</div>
+                    <div style={{ fontSize:10, color:"#C4A8B6", marginBottom:8, fontWeight:500 }}>{s.label}</div>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end" }}>
+                      <div><div style={{ fontSize:17, fontWeight:700, color:myUser.color }}>{s.my}</div><div style={{ fontSize:9, color:"#D4AABB" }}>Я</div></div>
+                      <div style={{ textAlign:"right" }}><div style={{ fontSize:17, fontWeight:700, color:theirUser.color }}>{s.their}</div><div style={{ fontSize:9, color:"#D4AABB" }}>Она</div></div>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10, marginBottom:14 }}>
+                ))}
+              </div>
+
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10, marginBottom:16 }}>
+                {[
+                  { icon:"💪", label:"Тренировка", pts:"+10", action:() => setModal("workout") },
+                  { icon:"⚖️", label:"Вес",         pts:"+5",  action:() => setModal("weight") },
+                  { icon:"📸", label:"Фото",         pts:"+15", action:() => setModal("photo") },
+                ].map(a => (
+                  <button key={a.label} onClick={a.action} className="action-btn"
+                    style={{ background:"white", border:"1px solid #F0E0E8", borderRadius:18, padding:"16px 8px", cursor:"pointer", color:"#2D1A24", fontFamily:"inherit", textAlign:"center", transition:"all 0.2s" }}>
+                    <div style={{ fontSize:24, marginBottom:6 }}>{a.icon}</div>
+                    <div style={{ fontSize:11, fontWeight:600, marginBottom:3, color:"#5A3549" }}>{a.label}</div>
+                    <div style={{ fontSize:10, color:myUser.color, fontWeight:700 }}>{a.pts} очков</div>
+                  </button>
+                ))}
+              </div>
+
+              <div style={{ fontSize:12, fontWeight:700, marginBottom:10, color:"#C4A8B6", letterSpacing:1, textTransform:"uppercase" }}>Последняя активность</div>
               {[
-                { icon:"💪", label:"Тренировка", pts:"+10", action:() => setModal("workout") },
-                { icon:"⚖️", label:"Вес", pts:"+5", action:() => setModal("weight") },
-                { icon:"📸", label:"Фото", pts:"+15", action:() => setModal("photo") },
-              ].map(a => (
-                <button key={a.label} onClick={a.action} className="action-btn"
-                  style={{ background:"#18181D", border:"1px solid #2a2a32", borderRadius:14, padding:"16px 8px", cursor:"pointer", color:"white", fontFamily:"'Outfit',sans-serif", textAlign:"center", transition:"all 0.2s" }}>
-                  <div style={{ fontSize:26, marginBottom:6 }}>{a.icon}</div>
-                  <div style={{ fontSize:11, fontWeight:600, marginBottom:4 }}>{a.label}</div>
-                  <div style={{ fontSize:10, color:myUser.color, fontWeight:700 }}>{a.pts} очков</div>
-                </button>
-              ))}
+                ...myData.workouts.slice(0,2).map(w => ({ ...w, kind:"workout", owner:whoAmI })),
+                ...friendData.workouts.slice(0,2).map(w => ({ ...w, kind:"workout", owner:friendId })),
+                ...myData.weights.slice(0,1).map(w => ({ ...w, kind:"weight", owner:whoAmI })),
+                ...friendData.weights.slice(0,1).map(w => ({ ...w, kind:"weight", owner:friendId })),
+              ].sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,5).map((item,i) => {
+                const u = USERS[item.owner];
+                return (
+                  <div key={i} style={{ background:"white", borderRadius:16, padding:"12px 14px", marginBottom:8, border:"1px solid #F0E0E8", borderLeft:`3px solid ${u.color}` }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                        <div style={{ width:34, height:34, borderRadius:"50%", background:u.light, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>
+                          {item.kind==="workout" ? "🏃" : "⚖️"}
+                        </div>
+                        <div>
+                          <div style={{ fontSize:12, fontWeight:600, color:"#2D1A24" }}>{item.kind==="workout" ? `${item.type} • ${item.minutes} мин` : `${item.value} кг`}</div>
+                          {item.note && <div style={{ fontSize:11, color:"#C4A8B6" }}>{item.note}</div>}
+                        </div>
+                      </div>
+                      <div style={{ textAlign:"right" }}>
+                        <div style={{ fontSize:10, color:u.color, fontWeight:700 }}>{u.emoji} {u.name}</div>
+                        <div style={{ fontSize:10, color:"#D4AABB" }}>{fmtDate(item.date)}</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              {myData.workouts.length===0 && friendData.workouts.length===0 && (
+                <div style={{ textAlign:"center", padding:36, color:"#D4AABB", fontSize:13 }}>Пока ничего нет — будь первой! 🌸</div>
+              )}
             </div>
-            <div style={{ fontSize:13, fontWeight:700, marginBottom:10, color:"#888" }}>Последняя активность</div>
-            {[
-              ...myData.workouts.slice(0,2).map(w => ({ ...w, kind:"workout", owner:whoAmI })),
-              ...friendData.workouts.slice(0,2).map(w => ({ ...w, kind:"workout", owner:friendId })),
-              ...myData.weights.slice(0,1).map(w => ({ ...w, kind:"weight", owner:whoAmI })),
-              ...friendData.weights.slice(0,1).map(w => ({ ...w, kind:"weight", owner:friendId })),
-            ].sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,5).map((item,i) => {
-              const u = USERS[item.owner];
-              return (
-                <div key={i} className="card" style={{ padding:"12px 14px", marginBottom:8, borderLeft:`3px solid ${u.color}` }}>
-                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                    <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                      <span style={{ fontSize:20 }}>{item.kind==="workout" ? "🏃" : "⚖️"}</span>
+          )}
+
+          {/* ── ТРЕНИРОВКИ ── */}
+          {activeTab === "workouts" && (
+            <div className="tab-content">
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
+                <div style={{ fontSize:16, fontWeight:700, color:"#2D1A24" }}>Все тренировки</div>
+                <button className="pill-btn" style={{ background:myUser.color }} onClick={() => setModal("workout")}>+ Добавить</button>
+              </div>
+              {[...myData.workouts.map(w => ({ ...w, owner:whoAmI })), ...friendData.workouts.map(w => ({ ...w, owner:friendId }))].sort((a,b) => b.id-a.id).map((w,i) => {
+                const u = USERS[w.owner];
+                return (
+                  <div key={i} style={{ background:"white", borderRadius:16, padding:"14px 16px", marginBottom:10, border:"1px solid #F0E0E8", borderLeft:`3px solid ${u.color}` }}>
+                    <div style={{ display:"flex", justifyContent:"space-between" }}>
                       <div>
-                        <div style={{ fontSize:12, fontWeight:600 }}>{item.kind==="workout" ? `${item.type} • ${item.minutes} мин` : `${item.value} кг`}</div>
-                        {item.note && <div style={{ fontSize:11, color:"#666" }}>{item.note}</div>}
-                      </div>
-                    </div>
-                    <div style={{ textAlign:"right" }}>
-                      <div style={{ fontSize:10, color:u.color, fontWeight:700 }}>{u.emoji} {u.name}</div>
-                      <div style={{ fontSize:10, color:"#555" }}>{fmtDate(item.date)}</div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-            {myData.workouts.length===0 && friendData.workouts.length===0 && (
-              <div style={{ textAlign:"center", padding:32, color:"#444", fontSize:13 }}>Пока ничего нет — будь первой! 🚀</div>
-            )}
-          </div>
-        )}
-
-        {activeTab === "workouts" && (
-          <div className="tab-content">
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
-              <div style={{ fontSize:16, fontWeight:700 }}>Все тренировки</div>
-              <button className="btn-primary" style={{ background:myUser.color }} onClick={() => setModal("workout")}>+ Добавить</button>
-            </div>
-            {[...myData.workouts.map(w => ({ ...w, owner:whoAmI })), ...friendData.workouts.map(w => ({ ...w, owner:friendId }))].sort((a,b) => b.id-a.id).map((w,i) => {
-              const u = USERS[w.owner];
-              return (
-                <div key={i} className="card" style={{ padding:"14px 16px", marginBottom:10, borderLeft:`3px solid ${u.color}` }}>
-                  <div style={{ display:"flex", justifyContent:"space-between" }}>
-                    <div>
-                      <div style={{ fontSize:13, fontWeight:700, marginBottom:4 }}>{w.type}
-                        <span style={{ fontSize:10, background:u.color+"22", color:u.color, padding:"2px 8px", borderRadius:99, marginLeft:8, fontWeight:600 }}>{u.emoji} {u.name}</span>
-                      </div>
-                      {w.note && <div style={{ fontSize:12, color:"#777" }}>{w.note}</div>}
-                    </div>
-                    <div style={{ textAlign:"right" }}>
-                      <div style={{ fontSize:18, fontWeight:700, color:u.color }}>{w.minutes} мин</div>
-                      <div style={{ fontSize:10, color:"#555" }}>{fmtDate(w.date)}</div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-            {myData.workouts.length===0 && friendData.workouts.length===0 && (
-              <div style={{ textAlign:"center", padding:40, color:"#555" }}>Тренировок пока нет. Вперёд! 💪</div>
-            )}
-          </div>
-        )}
-
-        {activeTab === "weight" && (
-          <div className="tab-content">
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
-              <div style={{ fontSize:16, fontWeight:700 }}>Дневник веса</div>
-              <button className="btn-primary" style={{ background:myUser.color }} onClick={() => setModal("weight")}>+ Записать</button>
-            </div>
-            {[whoAmI, friendId].map(uid => {
-              const u = USERS[uid]; const wts = data[uid].weights; const chg = weightChange(uid);
-              return (
-                <div key={uid} className="card" style={{ padding:16, marginBottom:14 }}>
-                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
-                    <div style={{ fontSize:14, fontWeight:700 }}>{u.emoji} {u.name}</div>
-                    {chg !== null && <div style={{ fontSize:12, fontWeight:700, color: parseFloat(chg)<=0 ? "#4ade80" : "#f87171" }}>{parseFloat(chg)<=0 ? `↓ −${Math.abs(chg)} кг` : `↑ +${chg} кг`}</div>}
-                  </div>
-                  {wts.length > 0 ? (
-                    <div style={{ display:"flex", gap:8, overflowX:"auto", paddingBottom:4 }}>
-                      {[...wts].reverse().map((w,i) => (
-                        <div key={i} style={{ background:"#25252D", borderRadius:10, padding:"10px 14px", textAlign:"center", flexShrink:0, minWidth:58 }}>
-                          <div style={{ fontSize:15, fontWeight:700, color:u.color }}>{w.value}</div>
-                          <div style={{ fontSize:9, color:"#555", marginTop:2 }}>кг</div>
-                          <div style={{ fontSize:9, color:"#666", marginTop:4 }}>{fmtDate(w.date)}</div>
+                        <div style={{ fontSize:13, fontWeight:700, color:"#2D1A24", marginBottom:4 }}>{w.type}
+                          <span style={{ fontSize:10, background:u.light, color:u.color, padding:"2px 8px", borderRadius:99, marginLeft:8, fontWeight:600 }}>{u.emoji} {u.name}</span>
                         </div>
-                      ))}
+                        {w.note && <div style={{ fontSize:12, color:"#C4A8B6" }}>{w.note}</div>}
+                      </div>
+                      <div style={{ textAlign:"right" }}>
+                        <div style={{ fontSize:18, fontWeight:700, color:u.color }}>{w.minutes} мин</div>
+                        <div style={{ fontSize:10, color:"#D4AABB" }}>{fmtDate(w.date)}</div>
+                      </div>
                     </div>
-                  ) : <div style={{ color:"#555", fontSize:12, textAlign:"center", padding:16 }}>Записей пока нет</div>}
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {activeTab === "photos" && (
-          <div className="tab-content">
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
-              <div style={{ fontSize:16, fontWeight:700 }}>Фото прогресса</div>
-              <button className="btn-primary" style={{ background:myUser.color }} onClick={() => setModal("photo")}>+ Добавить</button>
+                  </div>
+                );
+              })}
+              {myData.workouts.length===0 && friendData.workouts.length===0 && (
+                <div style={{ textAlign:"center", padding:40, color:"#D4AABB" }}>Тренировок пока нет. Вперёд! 💪</div>
+              )}
             </div>
-            {[...myData.photos.map(p => ({ ...p, owner:whoAmI })), ...friendData.photos.map(p => ({ ...p, owner:friendId }))].sort((a,b) => b.id-a.id).length === 0 ? (
-              <div className="card" style={{ padding:48, textAlign:"center" }}>
-                <div style={{ fontSize:48, marginBottom:12 }}>📸</div>
-                <div style={{ color:"#666", fontSize:13 }}>Фото пока нет — добавь первое и получи 15 очков!</div>
-              </div>
-            ) : (
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
-                {[...myData.photos.map(p => ({ ...p, owner:whoAmI })), ...friendData.photos.map(p => ({ ...p, owner:friendId }))].sort((a,b) => b.id-a.id).map((p,i) => {
-                  const u = USERS[p.owner];
-                  return (
-                    <div key={i} className="card" style={{ overflow:"hidden" }}>
-                      <div style={{ height:130, background:`linear-gradient(135deg,${u.color}22,#25252D)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:52 }}>
-                        {p.url ? <img src={p.url} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }} onError={e => { e.target.style.display="none"; }} /> : "💪"}
-                      </div>
-                      <div style={{ padding:10 }}>
-                        <div style={{ fontSize:10, color:u.color, fontWeight:700, marginBottom:4 }}>{u.emoji} {u.name}</div>
-                        <div style={{ fontSize:11, color:"#ccc" }}>{p.caption}</div>
-                        <div style={{ fontSize:9, color:"#555", marginTop:4 }}>{fmtDate(p.date)}</div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
+          )}
 
-        {activeTab === "badges" && (
-          <div className="tab-content">
-            <div style={{ fontSize:16, fontWeight:700, marginBottom:14 }}>Достижения</div>
-            {[whoAmI, friendId].map(uid => {
-              const u = USERS[uid];
-              return (
-                <div key={uid} style={{ marginBottom:20 }}>
-                  <div style={{ fontSize:12, color:"#777", fontWeight:600, marginBottom:10 }}>{u.emoji} {u.name} — {data[uid].badges.length} из {BADGES.length} получено</div>
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-                    {BADGES.map(b => {
-                      const unlocked = data[uid].badges.includes(b.id);
-                      return (
-                        <div key={b.id} className="card" style={{ padding:12, display:"flex", gap:10, alignItems:"center", opacity: unlocked?1:0.35, filter: unlocked?"none":"grayscale(1)", background: unlocked?`linear-gradient(135deg,${u.color}11,#18181D)`:"#18181D", border: unlocked?`1px solid ${u.color}33`:"1px solid #2a2a32" }}>
-                          <div style={{ fontSize:26 }}>{b.icon}</div>
-                          <div>
-                            <div style={{ fontSize:11, fontWeight:700 }}>{b.label}</div>
-                            <div style={{ fontSize:9, color:"#666", marginTop:2 }}>{b.desc}</div>
+          {/* ── ВЕС ── */}
+          {activeTab === "weight" && (
+            <div className="tab-content">
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
+                <div style={{ fontSize:16, fontWeight:700, color:"#2D1A24" }}>Дневник веса</div>
+                <button className="pill-btn" style={{ background:myUser.color }} onClick={() => setModal("weight")}>+ Записать</button>
+              </div>
+              {[whoAmI, friendId].map(uid => {
+                const u = USERS[uid]; const wts = data[uid].weights; const chg = weightChange(uid);
+                return (
+                  <div key={uid} style={{ background:"white", borderRadius:20, padding:16, marginBottom:14, border:"1px solid #F0E0E8" }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                        <div style={{ width:36, height:36, borderRadius:"50%", background:u.light, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18 }}>{u.emoji}</div>
+                        <div style={{ fontSize:14, fontWeight:700, color:"#2D1A24" }}>{u.name}</div>
+                      </div>
+                      {chg !== null && <div style={{ fontSize:12, fontWeight:700, color: parseFloat(chg)<=0 ? "#5CC98F" : "#E86262" }}>{parseFloat(chg)<=0 ? `↓ −${Math.abs(chg)} кг` : `↑ +${chg} кг`}</div>}
+                    </div>
+                    {wts.length > 0 ? (
+                      <div style={{ display:"flex", gap:8, overflowX:"auto", paddingBottom:4 }}>
+                        {[...wts].reverse().map((w,i) => (
+                          <div key={i} style={{ background:u.light, borderRadius:12, padding:"10px 14px", textAlign:"center", flexShrink:0, minWidth:58 }}>
+                            <div style={{ fontSize:15, fontWeight:700, color:u.color }}>{w.value}</div>
+                            <div style={{ fontSize:9, color:u.color+"99", marginTop:2 }}>кг</div>
+                            <div style={{ fontSize:9, color:u.color+"88", marginTop:4 }}>{fmtDate(w.date)}</div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        ))}
+                      </div>
+                    ) : <div style={{ color:"#D4AABB", fontSize:12, textAlign:"center", padding:16 }}>Записей пока нет</div>}
                   </div>
-                </div>
-              );
-            })}
-            <button onClick={resetData} style={{ background:"transparent", border:"1px solid #3a3a45", borderRadius:10, padding:"10px 16px", cursor:"pointer", color:"#555", fontSize:12, fontFamily:"'Outfit',sans-serif", marginTop:8 }}>
-              Сбросить мои данные
-            </button>
-          </div>
-        )}
+                );
+              })}
+            </div>
+          )}
 
-        <div style={{ height:40 }} />
+          {/* ── ФОТО ── */}
+          {activeTab === "photos" && (
+            <div className="tab-content">
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
+                <div style={{ fontSize:16, fontWeight:700, color:"#2D1A24" }}>Фото прогресса</div>
+                <button className="pill-btn" style={{ background:myUser.color }} onClick={() => setModal("photo")}>+ Добавить</button>
+              </div>
+              {[...myData.photos.map(p => ({ ...p, owner:whoAmI })), ...friendData.photos.map(p => ({ ...p, owner:friendId }))].sort((a,b) => b.id-a.id).length === 0 ? (
+                <div style={{ background:"white", borderRadius:24, padding:48, textAlign:"center", border:"1px solid #F0E0E8" }}>
+                  <div style={{ fontSize:48, marginBottom:12 }}>📸</div>
+                  <div style={{ color:"#D4AABB", fontSize:13 }}>Фото пока нет — добавь первое и получи 15 очков!</div>
+                </div>
+              ) : (
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+                  {[...myData.photos.map(p => ({ ...p, owner:whoAmI })), ...friendData.photos.map(p => ({ ...p, owner:friendId }))].sort((a,b) => b.id-a.id).map((p,i) => {
+                    const u = USERS[p.owner];
+                    return (
+                      <div key={i} style={{ background:"white", borderRadius:20, overflow:"hidden", border:"1px solid #F0E0E8" }}>
+                        <div style={{ height:130, background:u.light, display:"flex", alignItems:"center", justifyContent:"center", fontSize:52 }}>
+                          {p.url ? <img src={p.url} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }} onError={e => { e.target.style.display="none"; }} /> : u.emoji}
+                        </div>
+                        <div style={{ padding:10 }}>
+                          <div style={{ fontSize:10, color:u.color, fontWeight:700, marginBottom:4 }}>{u.emoji} {u.name}</div>
+                          <div style={{ fontSize:11, color:"#5A3549" }}>{p.caption}</div>
+                          <div style={{ fontSize:9, color:"#D4AABB", marginTop:4 }}>{fmtDate(p.date)}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── ЗНАЧКИ ── */}
+          {activeTab === "badges" && (
+            <div className="tab-content">
+              <div style={{ fontSize:16, fontWeight:700, color:"#2D1A24", marginBottom:14 }}>Достижения</div>
+              {[whoAmI, friendId].map(uid => {
+                const u = USERS[uid];
+                return (
+                  <div key={uid} style={{ marginBottom:20 }}>
+                    <div style={{ fontSize:12, color:"#C4A8B6", fontWeight:600, marginBottom:10, display:"flex", alignItems:"center", gap:6 }}>
+                      <span style={{ width:24, height:24, borderRadius:"50%", background:u.light, display:"inline-flex", alignItems:"center", justifyContent:"center", fontSize:12 }}>{u.emoji}</span>
+                      {u.name} — {data[uid].badges.length} из {BADGES.length} получено
+                    </div>
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+                      {BADGES.map(b => {
+                        const unlocked = data[uid].badges.includes(b.id);
+                        return (
+                          <div key={b.id} style={{ background: unlocked ? "white" : "#FAFAFA", borderRadius:16, padding:12, display:"flex", gap:10, alignItems:"center", opacity: unlocked?1:0.4, filter: unlocked?"none":"grayscale(1)", border: unlocked ? `1px solid ${u.color}22` : "1px solid #F0E0E8", boxShadow: unlocked ? `0 2px 12px ${u.color}10` : "none" }}>
+                            <div style={{ width:36, height:36, borderRadius:"50%", background: unlocked ? u.light : "#F5F0F3", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>{b.icon}</div>
+                            <div>
+                              <div style={{ fontSize:11, fontWeight:700, color: unlocked ? "#2D1A24" : "#C4A8B6" }}>{b.label}</div>
+                              <div style={{ fontSize:9, color:"#D4AABB", marginTop:2 }}>{b.desc}</div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+              <button onClick={resetData} style={{ background:"transparent", border:"1px solid #F0E0E8", borderRadius:10, padding:"10px 16px", cursor:"pointer", color:"#D4AABB", fontSize:12, fontFamily:"inherit", marginTop:8 }}>
+                Сбросить мои данные
+              </button>
+            </div>
+          )}
+
+        </div>
       </div>
 
+      {/* ── МОДАЛЬНЫЕ ОКНА ── */}
       {modal && (
-        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.75)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:100, backdropFilter:"blur(4px)" }} onClick={() => setModal(null)}>
-          <div className="card animate-in" style={{ width:"90%", maxWidth:380, padding:24 }} onClick={e => e.stopPropagation()}>
+        <div style={{ position:"fixed", inset:0, background:"rgba(45,26,36,0.4)", display:"flex", alignItems:"flex-end", justifyContent:"center", zIndex:100, backdropFilter:"blur(6px)" }} onClick={() => setModal(null)}>
+          <div style={{ background:"white", width:"100%", maxWidth:500, borderRadius:"24px 24px 0 0", padding:"28px 24px 40px", animation:"slideUp 0.3s ease" }} onClick={e => e.stopPropagation()}>
+            <div style={{ width:40, height:4, background:"#F0E0E8", borderRadius:99, margin:"0 auto 24px" }} />
+
             {modal === "workout" && <>
-              <div style={{ fontSize:18, fontWeight:700, marginBottom:18 }}>💪 Записать тренировку</div>
+              <div style={{ fontSize:18, fontWeight:700, color:"#2D1A24", marginBottom:18 }}>💪 Записать тренировку</div>
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-                <select className="input" value={form.type||""} onChange={e => setForm({...form, type:e.target.value})}>
+                <select className="girly-input" value={form.type||""} onChange={e => setForm({...form, type:e.target.value})}>
                   <option value="">Выбери вид нагрузки…</option>
                   {EXERCISES.map(e => <option key={e}>{e}</option>)}
                 </select>
-                <input className="input" type="number" placeholder="Длительность в минутах" value={form.minutes||""} onChange={e => setForm({...form, minutes:e.target.value})} />
-                <input className="input" type="text" placeholder="Заметка (необязательно)" value={form.note||""} onChange={e => setForm({...form, note:e.target.value})} />
+                <input className="girly-input" type="number" placeholder="Длительность в минутах" value={form.minutes||""} onChange={e => setForm({...form, minutes:e.target.value})} />
+                <input className="girly-input" type="text" placeholder="Заметка (необязательно) 🌸" value={form.note||""} onChange={e => setForm({...form, note:e.target.value})} />
                 <div style={{ display:"flex", gap:10, marginTop:6 }}>
-                  <button className="btn-sec" style={{ flex:1 }} onClick={() => setModal(null)}>Отмена</button>
-                  <button className="btn-primary" style={{ flex:2, background:myUser.color }} onClick={addWorkout}>Записать +10 очков 🎉</button>
+                  <button className="ghost-btn" style={{ flex:1 }} onClick={() => setModal(null)}>Отмена</button>
+                  <button className="pill-btn" style={{ flex:2, background:myUser.color, padding:"13px 0" }} onClick={addWorkout}>Записать +10 очков ✨</button>
                 </div>
               </div>
             </>}
+
             {modal === "weight" && <>
-              <div style={{ fontSize:18, fontWeight:700, marginBottom:18 }}>⚖️ Записать вес</div>
+              <div style={{ fontSize:18, fontWeight:700, color:"#2D1A24", marginBottom:18 }}>🎀 Записать вес</div>
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-                <input className="input" type="number" step="0.1" placeholder="Вес в кг (напр. 65.5)" value={form.weight||""} onChange={e => setForm({...form, weight:e.target.value})} />
-                <div style={{ fontSize:11, color:"#555" }}>Сегодня: {today()}</div>
+                <input className="girly-input" type="number" step="0.1" placeholder="Вес в кг (напр. 65.5)" value={form.weight||""} onChange={e => setForm({...form, weight:e.target.value})} />
+                <div style={{ fontSize:11, color:"#C4A8B6" }}>Сегодня: {today()}</div>
                 <div style={{ display:"flex", gap:10, marginTop:6 }}>
-                  <button className="btn-sec" style={{ flex:1 }} onClick={() => setModal(null)}>Отмена</button>
-                  <button className="btn-primary" style={{ flex:2, background:myUser.color }} onClick={addWeight}>Записать +5 очков ⚖️</button>
+                  <button className="ghost-btn" style={{ flex:1 }} onClick={() => setModal(null)}>Отмена</button>
+                  <button className="pill-btn" style={{ flex:2, background:myUser.color, padding:"13px 0" }} onClick={addWeight}>Записать +5 очков 🎀</button>
                 </div>
               </div>
             </>}
+
             {modal === "photo" && <>
-              <div style={{ fontSize:18, fontWeight:700, marginBottom:18 }}>📸 Поделиться фото</div>
+              <div style={{ fontSize:18, fontWeight:700, color:"#2D1A24", marginBottom:18 }}>📸 Поделиться фото</div>
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-                <input className="input" type="url" placeholder="Ссылка на фото (Imgur, Google Фото…)" value={form.photoUrl||""} onChange={e => setForm({...form, photoUrl:e.target.value})} />
-                <input className="input" type="text" placeholder="Подпись (напр. Неделя 3 💪)" value={form.caption||""} onChange={e => setForm({...form, caption:e.target.value})} />
-                <div style={{ background:"#25252D", borderRadius:10, padding:10, fontSize:11, color:"#777", lineHeight:1.6 }}>
-                  💡 Загрузи фото на <strong style={{ color:"#aaa" }}>imgur.com</strong>, правая кнопка → «Копировать адрес изображения», вставь сюда.
+                <input className="girly-input" type="url" placeholder="Ссылка на фото (Imgur, Google Фото…)" value={form.photoUrl||""} onChange={e => setForm({...form, photoUrl:e.target.value})} />
+                <input className="girly-input" type="text" placeholder="Подпись (напр. Неделя 3 🌸)" value={form.caption||""} onChange={e => setForm({...form, caption:e.target.value})} />
+                <div style={{ background:"#FDF0F5", borderRadius:12, padding:10, fontSize:11, color:"#C4819B", lineHeight:1.6 }}>
+                  💡 Загрузи фото на <strong>imgur.com</strong>, правая кнопка → «Копировать адрес», вставь сюда.
                 </div>
                 <div style={{ display:"flex", gap:10, marginTop:6 }}>
-                  <button className="btn-sec" style={{ flex:1 }} onClick={() => setModal(null)}>Отмена</button>
-                  <button className="btn-primary" style={{ flex:2, background:myUser.color }} onClick={addPhoto}>Поделиться +15 очков 📸</button>
+                  <button className="ghost-btn" style={{ flex:1 }} onClick={() => setModal(null)}>Отмена</button>
+                  <button className="pill-btn" style={{ flex:2, background:myUser.color, padding:"13px 0" }} onClick={addPhoto}>Поделиться +15 очков 📸</button>
                 </div>
               </div>
             </>}
@@ -505,8 +541,9 @@ export default function FitRivals() {
         </div>
       )}
 
+      {/* Тост */}
       {toast && (
-        <div style={{ position:"fixed", bottom:28, left:"50%", transform:"translateX(-50%)", background:myUser?.color||"#FF6B35", color:"white", padding:"12px 24px", borderRadius:99, fontSize:13, fontWeight:700, zIndex:200, whiteSpace:"nowrap", boxShadow:"0 8px 30px rgba(0,0,0,0.4)", animation:"toastIn 0.3s ease" }}>
+        <div style={{ position:"fixed", bottom:28, left:"50%", transform:"translateX(-50%)", background:myUser?.color||"#E8628A", color:"white", padding:"12px 24px", borderRadius:99, fontSize:13, fontWeight:600, zIndex:200, whiteSpace:"nowrap", boxShadow:`0 8px 30px ${myUser?.color||"#E8628A"}55`, animation:"toastIn 0.3s ease" }}>
           {toast}
         </div>
       )}
@@ -514,32 +551,32 @@ export default function FitRivals() {
   );
 }
 
-const S = { root: { fontFamily:"'Outfit',sans-serif", background:"#0D0D0F", color:"#F0EDE8", minHeight:"100vh" } };
+const S = { root: { fontFamily:"'DM Sans', -apple-system, sans-serif", color:"#2D1A24", minHeight:"100vh" } };
 
 const css = `
-  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&family=Space+Mono:wght@700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap');
   * { box-sizing:border-box; margin:0; padding:0; }
   ::-webkit-scrollbar { width:4px; height:4px; }
-  ::-webkit-scrollbar-track { background:#1a1a1f; }
-  ::-webkit-scrollbar-thumb { background:#FF6B35; border-radius:2px; }
-  .card { background:#18181D; border:1px solid #2a2a32; border-radius:16px; }
-  .btn-primary { background:#FF6B35; color:white; border:none; border-radius:10px; padding:11px 18px; font-family:'Outfit',sans-serif; font-weight:600; font-size:13px; cursor:pointer; transition:all 0.2s; }
-  .btn-primary:hover { filter:brightness(1.1); transform:translateY(-1px); }
-  .btn-sec { background:#25252D; color:#F0EDE8; border:1px solid #3a3a45; border-radius:10px; padding:11px 18px; font-family:'Outfit',sans-serif; font-weight:500; font-size:13px; cursor:pointer; }
-  .icon-btn { background:#25252D; border:1px solid #3a3a45; border-radius:10px; padding:8px 12px; cursor:pointer; color:#888; font-family:'Outfit',sans-serif; font-size:12px; }
-  .input { background:#25252D; border:1px solid #3a3a45; border-radius:10px; padding:12px 14px; color:#F0EDE8; font-family:'Outfit',sans-serif; font-size:14px; width:100%; outline:none; transition:border 0.2s; }
-  .input:focus { border-color:#FF6B35; }
-  .input::placeholder { color:#555; }
-  select.input option { background:#25252D; }
-  .tab-btn { transition:all 0.2s; }
-  .tab-btn:hover { transform:translateY(-2px); }
-  .action-btn:hover { border-color:#FF6B35 !important; transform:translateY(-2px); }
+  ::-webkit-scrollbar-track { background:#FDF0F5; }
+  ::-webkit-scrollbar-thumb { background:#E8A0B8; border-radius:2px; }
   .profile-btn { transition:all 0.2s; }
-  .profile-btn:hover { transform:translateY(-2px); }
+  .profile-btn:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(232,98,138,0.15) !important; }
+  .tab-btn { transition:all 0.2s; }
+  .tab-btn:hover { transform:translateY(-1px); }
+  .action-btn:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(232,98,138,0.12) !important; border-color:#E8A0B8 !important; }
   .tab-content { animation:fadeUp 0.25s ease; }
+  .soft-btn { background:#FDF0F5; border:none; border-radius:10px; padding:8px 12px; cursor:pointer; color:#C4819B; font-family:inherit; font-size:12px; font-weight:500; transition:all 0.2s; }
+  .soft-btn:hover { background:#FAE0EA; }
+  .pill-btn { color:white; border:none; border-radius:99px; padding:11px 20px; font-family:inherit; font-weight:600; font-size:13px; cursor:pointer; transition:all 0.2s; }
+  .pill-btn:hover { filter:brightness(1.05); transform:translateY(-1px); }
+  .ghost-btn { background:white; color:#A0748A; border:1.5px solid #F0E0E8; border-radius:99px; padding:11px 20px; font-family:inherit; font-weight:500; font-size:13px; cursor:pointer; }
+  .girly-input { background:#FDF6F9; border:1.5px solid #F0E0E8; border-radius:14px; padding:13px 16px; color:#2D1A24; font-family:inherit; font-size:14px; width:100%; outline:none; transition:border 0.2s; }
+  .girly-input:focus { border-color:#E8628A; }
+  .girly-input::placeholder { color:#D4AABB; }
+  select.girly-input option { background:white; color:#2D1A24; }
   @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes slideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
   @keyframes toastIn { from { transform:translateX(-50%) translateY(20px); opacity:0; } to { transform:translateX(-50%) translateY(0); opacity:1; } }
   @keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
-  .animate-in { animation:fadeUp 0.3s ease; }
-  .spin { display:inline-block; animation:spin 1s linear infinite; }
+  .spin { display:inline-block; animation:spin 1.5s linear infinite; }
 `;

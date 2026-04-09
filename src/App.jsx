@@ -536,6 +536,17 @@ export default function FitDuelia() {
               <div style={{ fontSize:18, fontWeight:700, color:"#2D1A24", marginBottom:18 }}>💪 Записать тренировку</div>
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                 <select className="girly-input" value={form.type||""} onChange={e => setForm({...form, type:e.target.value})}>
+                  <label style={{ marginTop: "10px", display: "block" }}>
+  Дата тренировки 💖
+</label>
+
+<input
+  className="girly-input"
+  type="date"
+  value={form.date || today()}
+  max={today()} // prevents future dates
+  onChange={e => setForm({ ...form, date: e.target.value })}
+/>
                   <option value="">Выбери вид нагрузки…</option>
                   {EXERCISES.map(e => <option key={e}>{e}</option>)}
                 </select>

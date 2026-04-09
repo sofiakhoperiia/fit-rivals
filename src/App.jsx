@@ -125,22 +125,34 @@ export default function FitDuelia() {
   };
 
   const addWorkout = async () => {
-    if (!form.type || !form.minutes) return;
-    const cur = { ...data[whoAmI] };
-    cur.workouts = [{
-  id: Date.now(),
-  type: form.type,
-  minutes: parseInt(form.minutes),
-  date: form.date || today(), // 👈 allows past date
-  note: form.note || "",
-  points: getWorkoutPoints(parseInt(form.minutes)) // 👈 NEW
-}, ...cur.workouts];
-    cur.badges = checkBadges(cur);
-    setData(p => ({ ...p, [whoAmI]: cur }));
-    await saveUser(whoAmI, cur);
-    showToast(`+${getWorkoutPoints(form.minutes)} очков! ${form.type} записана ✨`);
-    setModal(null); setForm({});
-  };
+  if (!form.type || !form.minutes) return;
+
+  const cur = { ...data[whoAmI] };
+
+  const minutes = parseInt(form.minutes);
+
+  cur.workouts = [
+    {
+      id: Date.now(),
+      type: form.type,
+      minutes: minutes,
+      date: form.date || today(), // 📅 allows past date
+      note: form.note || "",
+      points: getWorkoutPoints(minutes) // 💪 dynamic points
+    },
+    ...cur.workouts
+  ];
+
+  cur.badges = checkBadges(cur);
+
+  setData(p => ({ ...p, [whoAmI]: cur }));
+  await saveUser(whoAmI, cur);
+
+  showToast(`+${getWorkoutPoints(minutes)} очков! ${form.type} записана ✨`);
+
+  setModal(null);
+  setForm({});
+};
 
   const addWeight = async () => {
     if (!form.weight) return;
